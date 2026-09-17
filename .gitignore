@@ -1,0 +1,6 @@
+node_modules/
+.cache/
+.skill-kit/
+dist/
+.env
+*.tmp

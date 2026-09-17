@@ -1,0 +1,20 @@
+Semantic Skill Kit
+Created for Uli, 2026.
+
+Portions are adapted from Google Modern Web Guidance, licensed under Apache-2.0:
+https://github.com/GoogleChrome/modern-web-guidance-src
+Source commit: 1ca697f533cd00a71f783576c03062cbb2aefec1 (2026-09-16)
+Distribution examined: https://github.com/GoogleChrome/modern-web-guidance
+Distribution commit: 16ed22b43fa56157adadfb25f18a354197d497b9
+
+Adapted source:
+- serving/lib/search.ts: cosine similarity, maximum score per document, threshold and top-K.
+- serving/scripts/build-guides.ts: Markdown heading chunks, metadata chunk, embedding text structure.
+- serving/lib/transformers-embedder.ts: feature-extraction, mean pooling and normalization.
+
+Modifications: JavaScript modules, generic documents/configuration, incremental chunk cache,
+token windows, atomic snapshots, input validation, polling watcher, skill export and tests.
+Transformers.js is used for both indexing and querying instead of Google's separate TFJS runtime.
+Google's guides, telemetry, web-feature expansion and evaluation infrastructure are not included.
+This is an independent derivative and is not endorsed by Google.
+Third-party dependencies and any downloaded model retain their respective licenses.

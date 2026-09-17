@@ -1,0 +1,4 @@
+.cache/
+.skill-kit/
+dist/
+node_modules/

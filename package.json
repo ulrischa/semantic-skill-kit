@@ -1,0 +1,40 @@
+{
+  "name": "semantic-skill-kit",
+  "version": "0.1.0",
+  "description": "Build reusable knowledge skills using local semantic retrieval derived from Google Modern Web Guidance.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": "Uli",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "skill-kit": "./src/cli.mjs"
+  },
+  "exports": "./src/index.mjs",
+  "files": [
+    "src",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "assets"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "test:integration": "node test/real-model.mjs",
+    "check": "node --check src/cli.mjs"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "3.8.1",
+    "marked": "18.0.3",
+    "yaml": "2.8.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ulrischa/semantic-skill-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ulrischa/semantic-skill-kit/issues"
+  },
+  "homepage": "https://github.com/ulrischa/semantic-skill-kit#readme"
+}

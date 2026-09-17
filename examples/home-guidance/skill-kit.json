@@ -1,0 +1,27 @@
+{
+  "name": "home-guidance",
+  "description": "Search the example household guidance for restoring backed-up documents and watering indoor plants. Use only for those topics.",
+  "knowledge": "knowledge",
+  "output": ".skill-kit",
+  "cache": ".cache/models",
+  "model": {
+    "id": "Xenova/all-MiniLM-L6-v2",
+    "revision": "751bff37182d3f1213fa05d7196b954e230abad9",
+    "dtype": "q8",
+    "maxTokens": 256,
+    "queryPrefix": "",
+    "documentPrefix": ""
+  },
+  "chunk": {
+    "maxTokens": 240,
+    "overlap": 32
+  },
+  "search": {
+    "topK": 5,
+    "threshold": 0.3
+  },
+  "watch": {
+    "intervalMs": 1000,
+    "settleMs": 800
+  }
+}
