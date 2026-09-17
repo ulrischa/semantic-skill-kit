@@ -1,6 +1,6 @@
 # Semantic Skill Kit
 
-Create topic-specific agent skills from interchangeable Markdown knowledge bases. Local Node.js semantic retrieval adapted from [Google Modern Web Guidance](https://github.com/GoogleChrome/modern-web-guidance-src). Created for Uli. Apache-2.0.
+Create topic-specific agent skills from interchangeable Markdown knowledge bases. Local Node.js semantic retrieval adapted from [Google Modern Web Guidance](https://github.com/GoogleChrome/modern-web-guidance-src).
 
 ## Inspiration and attribution
 
