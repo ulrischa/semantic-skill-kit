@@ -8,7 +8,12 @@ import { readIndex, writeIndex } from './storage.mjs';
 import { loadConfig, within } from './config.mjs';
 import { readKnowledge } from './documents.mjs';
 const kit = fileURLToPath(new URL('../', import.meta.url));
-export async function exportSkill(c, destination, { includeModel = false, ...buildOptions } = {}) {
+export async function exportSkill(c, destination, { mode = 'semantic', includeModel = false, ...buildOptions } = {}) {
+  if (mode === 'routed') {
+    const { exportRouted } = await import('./routed.mjs');
+    return exportRouted(c, destination, { includeModel, ...buildOptions });
+  }
+  if (mode !== 'semantic') throw Error('Export mode must be semantic or routed.');
   const target = path.resolve(destination);
   if (within(c.knowledge, target) || within(c.output, target) || within(c.cache, target) || within(target, c.root)) throw Error('Export must be outside knowledge, output and model cache, and cannot contain the project.');
   try { await lstat(target); throw Error(`Destination already exists: ${target}`); } catch(e) { if(e.code !== 'ENOENT') throw e; }

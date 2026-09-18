@@ -8,7 +8,8 @@ export const defaults = {
   model: { id: 'Xenova/all-MiniLM-L6-v2', revision: '751bff37182d3f1213fa05d7196b954e230abad9', dtype: 'q8', maxTokens: 256, queryPrefix: '', documentPrefix: '' },
   chunk: { maxTokens: 240, overlap: 32 },
   search: { topK: 5, threshold: 0.3 },
-  watch: { intervalMs: 1000, settleMs: 800 }
+  watch: { intervalMs: 1000, settleMs: 800 },
+  routing: { baseUrl: 'https://api.openai.com/v1', model: '', apiKeyEnv: 'OPENAI_API_KEY', language: 'English', maxInputChars: 12000, pageSize: 8, timeoutMs: 120000 }
 };
 export const hash = value => createHash('sha256').update(typeof value === 'string' ? value : JSON.stringify(value)).digest('hex');
 export function within(root, child) {

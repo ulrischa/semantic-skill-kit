@@ -20,14 +20,15 @@ skill-kit search "query" [--top-k 5] [--threshold 0.3] [--offline]
 skill-kit retrieve <id>
 skill-kit status
 skill-kit model [--offline]
-skill-kit export <new-directory> [--include-model] [--offline]
+skill-kit export <new-directory> [--mode semantic|routed] [--include-model] [--offline]
 
 Use --project <directory> with any command except init. Default: current directory.
-Export creates a skill directory. Run npm ci inside it once before use.
+Semantic exports need npm ci before use. Routed exports contain Markdown only.
+Configure routing.model and an API key environment variable for routed builds.
 `;
 async function main() {
   const { values, positionals } = parseArgs({ allowPositionals:true, options:{
-    project:{type:'string'}, force:{type:'boolean'}, offline:{type:'boolean'},
+    mode:{type:'string'}, project:{type:'string'}, force:{type:'boolean'}, offline:{type:'boolean'},
     'include-model':{type:'boolean'}, 'top-k':{type:'string'}, threshold:{type:'string'},
     help:{type:'boolean',short:'h'}
   }});
@@ -49,7 +50,7 @@ async function main() {
     await watch(root,{signal:controller.signal,buildOptions:{offline:values.offline,log:options.log},onBuild:r=>console.error(JSON.stringify(r)),onError:e=>console.error(`Build postponed: ${e.message}`)});
     return;
   }
-  if(command === 'export') { console.log(await exportSkill(c,arg,{...options,includeModel:values['include-model']})); return; }
+  if(command === 'export') { console.log(await exportSkill(c,arg,{...options,mode:values.mode,includeModel:values['include-model']})); return; }
   if(command === 'model') {
     const engine=await createEmbedder(c,options);
     try { console.log(JSON.stringify({model:c.model,dimensions:(await engine.embed('Model check')).length,cache:c.cache},null,2)); }

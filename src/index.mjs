@@ -4,3 +4,5 @@ export { watch } from './watch.mjs';
 export { rank, retrieve, cosineSimilarity } from './search.mjs';
 export { readIndex } from './storage.mjs';
 export { createEmbedder } from './embedder.mjs';
+export { exportSkill } from './export.mjs';
+export { exportRouted } from './routed.mjs';

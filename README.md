@@ -38,6 +38,82 @@ Run `npm ci` once inside the exported skill. Its `SKILL.md` instructs an agent t
 
 Optional: run `npm link` in this repository and use `skill-kit` instead of `node src/cli.mjs`. This project has not been published under a guaranteed npm package name.
 
+## Two export modes
+
+| Mode | Build | Exported skill at runtime |
+|---|---|---|
+| `semantic` (default) | Local MiniLM embeddings | Node.js, local embedding model, vector search |
+| `routed` | Full generative LLM via an API | Markdown instructions, indexes and original references only |
+
+### Build an LLM-routed skill
+
+The routed path **does not build vectors or load MiniLM**. It creates a task-oriented navigation tree that ChatGPT or another agent can read directly. A compatible environment must expose the bundled Markdown references to the agent; uploading a package is not, by itself, a guarantee of platform support.
+
+Add or edit this object in your project's `skill-kit.json` (new projects include these settings):
+
+```json
+"routing": {
+  "baseUrl": "https://api.openai.com/v1",
+  "model": "YOUR_CHAT_MODEL_ID",
+  "apiKeyEnv": "OPENAI_API_KEY",
+  "language": "English",
+  "maxInputChars": 12000,
+  "pageSize": 8,
+  "timeoutMs": 120000
+}
+```
+
+Use a generative chat model supporting the [Chat Completions API](https://developers.openai.com/api/reference/resources/chat) and JSON object responses. The API base URL is configurable for compatible providers and local servers. Native Anthropic or other non-compatible protocols are not implemented. HTTPS is required except for loopback addresses. No particular paid model is chosen automatically. Alternatively, leave `model` empty and set `SKILL_KIT_LLM_MODEL`.
+
+Set the key outside the configuration file. Bash:
+
+```bash
+export OPENAI_API_KEY="your-api-key"
+node src/cli.mjs export dist/my-topic-routed --project my-topic --mode routed
+```
+
+PowerShell:
+
+```powershell
+$env:OPENAI_API_KEY = "your-api-key"
+node src/cli.mjs export dist/my-topic-routed --project my-topic --mode routed
+```
+
+For a local compatible server that ignores authentication, set the configured key variable to a non-secret placeholder. Environment files are not loaded automatically. Neither keys nor API settings are copied into the generated skill.
+
+**The build sends document sections and frontmatter to the configured provider and can incur API charges.** Requests run sequentially. There are no automatic retries; errors stop the build without publishing a partial skill. Valid responses are cached in `<output>/routing-cache/` by model, endpoint, prompt and source content. `--force` regenerates responses. `--offline` allows cached builds only and fails on a cache miss. The cache contains generated descriptions and should be treated as knowledge-base data.
+
+The generator:
+
+1. Reads every Markdown section with its parent heading context. Long sections are split into character windows without discarding their tails; `maxInputChars` controls section content, not the complete request token count. Metadata and instructions add overhead.
+2. Uses an LLM to describe concrete user tasks and the section's scope.
+3. Preserves explicit `category` and `categories` assignments; a reference may appear under several categories. If none is provided, the LLM proposes a topic. Existing descriptions, tags and other frontmatter are included as context.
+4. Groups entries into pages of at most `pageSize` items, generates page summaries, and recursively builds parent indexes to keep the skill entrypoint small.
+5. Copies original Markdown files unchanged, including their full frontmatter. A complete paginated catalog provides a fallback when thematic routing is unclear.
+6. Checks for source changes before publishing. File paths and coverage come from the program, never from model-generated filenames.
+
+Generated descriptions are bounded and validated as JSON. Their factual quality still depends on the model: review routing with representative questions before relying on it. The runtime instructions require reading the actual references before answering. Categories are retained verbatim; generated descriptions use `routing.language` and source text retains its original language. Non-Markdown linked assets are not copied.
+
+The result contains:
+
+```text
+my-topic-routed/
+  SKILL.md
+  indexes/
+    page-1.md
+    ...
+    catalog.md
+    catalog-1.md
+    ...
+  references/guides/
+    original-document.md
+    ...
+  LICENSE
+  NOTICE
+```
+
+No npm installation, embedding model, vector index, API call or executable script is needed to use this exported skill. `--include-model` is rejected for routed exports. The existing `build` and `watch` commands maintain the semantic index; routed generation is explicitly invoked through `export --mode routed` so background edits cannot silently trigger paid LLM requests. Re-export to a new destination after updates; unchanged requests reuse the cache.
+
 ## Example
 
 ```bash
@@ -122,7 +198,7 @@ The default MiniLM model is primarily intended for English. Use an appropriate m
 
 `chunk.maxTokens` includes metadata context, and must leave room for model special tokens. Long sections are split into overlapping windows; retrieved documents remain unchanged. Scores are similarity values, not probabilities. Validate thresholds with representative questions. Linear vector scanning and in-memory snapshots suit curated knowledge bases, not millions of documents.
 
-## Export structure
+## Semantic export structure
 
 The export destination must not already exist. Export first ensures the index is current, then produces an independent skill directory:
 
@@ -157,6 +233,8 @@ This includes the project's model cache and makes the generated skill use `searc
 npm test
 npm run test:integration
 ```
+
+Routed tests exercise the HTTP client against a local mock API, including invalid responses, timeouts, cache invalidation, manual categories, long documents, and complete reference reachability. They do not measure real-model routing quality or call a paid provider.
 
 Unit/integration tests with controlled vectors cover chunking, ranking, caching, deletion, atomic failure recovery, concurrent builds, folder replacement and export. The separate real-model test verifies MiniLM search, token windows and offline export. Its cache defaults to `examples/home-guidance/.cache/models`; override with `SKILL_KIT_TEST_CACHE`.
 
